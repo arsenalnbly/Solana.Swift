@@ -12,6 +12,34 @@ import XCTest
 
 @available(iOS 13.0.0, *)
 final class TransactionTest: XCTestCase {
+    func testGetUnsignedTransactionHex() async throws {
+        let payer = PublicKey(string: "H9ca27xrgMhJkCksnD3aZkvjiFE2fMuasFwyHNUNcYaj")!
+        let lamports = 1_000_000
+        let receiver = PublicKey(string: "5SRDAEWJ99aaoTeRyRZSe7zxRicciPd8Np4hb65ZaiKQ")!
+        let recentBlockhash = "E53BwYMqzzeiSoPTo2JQSY23JZMp3eh9TqN7CLynMHp8"
+        
+        let instruction = SystemProgram.transferInstruction(
+            from: payer,
+            to: receiver,
+            lamports: UInt64(lamports)
+        )
+        var transaction = Transaction(
+            feePayer: payer,
+            instructions: [instruction],
+            recentBlockhash: recentBlockhash
+        )
+        let serializedTx = transaction.serialize(
+            requiredAllSignatures: false,
+            verifySignatures: false
+        )
+        switch serializedTx {
+        case .success(let success):
+            print(success.hexString)
+            XCTAssertEqual(success.hexString, "010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000103efefdb0a73bc827a374f30e877dca720895775e8a8d322351fb4bf9cdc20c3e841f1a450fd70bfe1801db57fd18973a4cd9bf89b78f64cfb23f4ca2a0c8924d70000000000000000000000000000000000000000000000000000000000000000c230ba5c0ddd105f48fb82cfb671ca71064e983c55628bacfcea19b4704e111d01020200010c0200000040420f0000000000")
+        case .failure(let failure):
+            throw failure
+        }
+    }
     
     func testCompiledMessageAccountKeysAreOrdered() async throws {
         // These pubkeys are chosen specially to be in sort order.
