@@ -130,19 +130,19 @@ extension SolanaSocket: WebSocketDelegate {
     public func didReceive(event: WebSocketEvent, client: WebSocket) {
         log(event: event)
         switch event {
-        case .connected:
+        case .connected(_):
             delegate?.connected()
         case .disconnected(let reason, let code):
             delegate?.disconnected(reason: reason, code: code)
         case .text(let string):
             onText(string: string)
-        case .binary: break
-        case .ping: break
-        case .pong: break
-        case .viabilityChanged: break
-        case .reconnectSuggested: break
+        case .binary(_): break
+        case .ping(_): break
+        case .pong(_): break
+        case .viabilityChanged(_): break
+        case .reconnectSuggested(_): break
         case .cancelled: break
-        case .error(let error): break
+        case .error(let error):
             self.delegate?.error(error: error)
         }
     }
@@ -155,11 +155,11 @@ extension SolanaSocket: WebSocketDelegate {
             if enableDebugLogs { debugPrint("disconnected with reason \(reason) \(code)") }
         case .text(let string):
             if enableDebugLogs { debugPrint("text \(string)") }
-        case .binary:
-            if enableDebugLogs { debugPrint("binary") }
-        case .ping:
+        case .binary(let data):
+            if enableDebugLogs { debugPrint("binary \(String(data: data, encoding: .utf8) ?? "")") }
+        case .ping(_):
             if enableDebugLogs { debugPrint("ping") }
-        case .pong:
+        case .pong(_):
             if enableDebugLogs { debugPrint("pong") }
         case .viabilityChanged(let visible):
             if enableDebugLogs { debugPrint("viabilityChanged \(visible)") }
