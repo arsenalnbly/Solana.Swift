@@ -266,10 +266,14 @@ public struct Transaction {
 
     // MARK: - Serializing
     private mutating func _serialize(serializedMessage: Data) -> Result<Data, Error> {
-        // signature length
-        let signaturesLength = signatures.count
+//        // signature length
+//        let signaturesLength = signatures.count
+//        let encodedSignatureLength = Data.encodeLength(signaturesLength)
+        
+        // num of required signatures instead of actual signatures.count to add placeholder for signatures
+        let signaturesLength = Int(serializedMessage.first ?? 0)
         let encodedSignatureLength = Data.encodeLength(signaturesLength)
-
+        
         // transaction length
         let dataLength = encodedSignatureLength.count + signaturesLength * 64 + serializedMessage.count
         var data = Data(count: dataLength)
